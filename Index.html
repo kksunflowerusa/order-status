@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KK Sunflower國際物流訂單查詢</title>
+<title>KK Sunflower 國際物流訂單查詢</title>
 <style>
-  body { font-family: Arial, sans-serif; background: #f0f2f5; display:flex;justify-content:center;align-items:center;height:100vh;margin:0; }
+  body { font-family: Arial, sans-serif; background:#f0f2f5; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
   .container { background:#fff; padding:40px 30px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); text-align:center; width:90%; max-width:400px; }
   h2 { margin:0 0 16px 0; font-size:20px; }
   select, input[type="text"], button { width:100%; padding:12px; margin-bottom:12px; font-size:16px; border-radius:6px; border:1px solid #ccc; box-sizing:border-box; }
@@ -17,36 +17,37 @@
 </style>
 </head>
 <body>
-  <div class="container">
-    <h2>KK Sunflower 國際物流<br>訂單狀態查詢</h2>
+<div class="container">
+  <h2>KK Sunflower 國際物流<br>訂單狀態查詢</h2>
 
-    <!-- ★ 新增來源選擇 -->
-    <select id="source">
-      <option value="">--請選擇資料來源--</option>
-      <option value="A1">A1</option>
-      <option value="A1-A">A1-A</option>
-      <option value="A2">A2</option>
-      <option value="A2-A">A2-A</option>
-      <option value="A3">A3</option>
-      <option value="A3-A">A3-A</option>
-      <option value="A4">A4</option>
-      <option value="B2">B2</option>
-      <option value="B3">B3</option>
-      <option value="B5">B5</option>
-      <option value="C2">C2</option>
-      <option value="C2-DE">C2-DE</option>
-    </select>
+  <!-- 資料來源選擇 -->
+  <select id="source">
+    <option value="">--請選擇資料來源--</option>
+    <option value="A1">A1</option>
+    <option value="A1-A">A1-A</option>
+    <option value="A2">A2</option>
+    <option value="A2-A">A2-A</option>
+    <option value="A3">A3</option>
+    <option value="A3-A">A3-A</option>
+    <option value="A4">A4</option>
+    <option value="B2">B2</option>
+    <option value="B3">B3</option>
+    <option value="B5">B5</option>
+    <option value="C2">C2</option>
+    <option value="C2-DE">C2-DE</option>
+  </select>
 
-    <input id="order" type="text" placeholder="請輸入訂單號" />
-    <button id="btn">查詢</button>
-    <div id="description">請先選擇資料來源，再輸入訂單號並按「查詢」</div>
-    <div id="result"></div>
-    <div id="statusDesc"></div>
-  </div>
+  <input id="order" type="text" placeholder="請輸入訂單號" />
+  <button id="btn">查詢</button>
+  <div id="description">請先選擇資料來源，再輸入訂單號並按「查詢」</div>
+  <div id="result"></div>
+  <div id="statusDesc"></div>
+</div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwtOLTAfDgSmjjddoVJGxmmk0_pBJL38OkiEfv4rFZDKL2d8VuNyAuK87s-5Tia7xLS/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwtOLTAfDgSmjjddoVJGxmmk0_pBJL38OkiEfv4rFZDKL2d8VuNyAuK87s-5Tia7xLS/exec'; // ←改成你的 Apps Script URL
 
+// 狀態說明對照表
 const statusMap = {
   "新訂單": "新成立訂單",
   "新竹物流取件已安排": "表示已經委派台灣物流去取件",
@@ -84,29 +85,21 @@ function checkOrder() {
   statusDescEl.textContent = '';
 
   fetch(`${SCRIPT_URL}?source=${encodeURIComponent(source)}&order=${encodeURIComponent(order)}`)
-    .then(r => r.json())
-    .then(data => {
-      if (data.status !== "ok") {
-        resultEl.textContent = '查詢失敗：' + (data.message || '');
-        return;
-      }
-      const st = data.result || "訂單尚未更新";
+    .then(r => r.text()) // ★ 使用 text()，因為 Apps Script 回傳純文字
+    .then(txt => {
+      const st = txt.trim() || "訂單尚未更新";
       resultEl.textContent = `狀態：${st}`;
       statusDescEl.textContent = statusMap[st] || "無對應說明";
     })
     .catch(err => {
       console.error(err);
       resultEl.textContent = '查詢失敗，請稍後再試';
+      statusDescEl.textContent = '';
     });
 }
 
 btnEl.addEventListener('click', checkOrder);
-inputEl.addEventListener('keyup', e => { if (e.key === 'Enter') checkOrder(); });
+inputEl.addEventListener('keyup', e => { if(e.key === 'Enter') checkOrder(); });
 </script>
 </body>
 </html>
-
-
-
-
-
