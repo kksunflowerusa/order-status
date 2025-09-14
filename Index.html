@@ -5,23 +5,87 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KK Sunflower 國際物流訂單查詢</title>
 <style>
-  body { font-family: Arial, sans-serif; background:#f0f2f5; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
-  .container { background:#fff; padding:40px 30px; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.1); text-align:center; width:90%; max-width:400px; }
-  h2 { margin:0 0 16px 0; font-size:20px; }
-  select, input[type="text"], button { width:100%; padding:12px; margin-bottom:12px; font-size:16px; border-radius:6px; border:1px solid #ccc; box-sizing:border-box; }
-  button { border:none; background:#4CAF50; color:#fff; cursor:pointer; }
-  button:hover { background:#45a049; }
-  #description { font-size:14px; color:#555; margin-top:12px; }
-  #result { margin-top:20px; padding:12px; background:#f4f4f4; border-radius:6px; font-weight:bold; }
-  #statusDesc { margin-top:10px; font-size:14px; color:#333; text-align:left; white-space:pre-line; }
+  body {
+    font-family: Arial, sans-serif;
+    background: #f0f2f5;
+    margin: 0;
+    padding: 20px 0;
+  }
+  .container {
+    background: #fff;
+    padding: 40px 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+    margin: 0 auto; /* 水平置中 */
+  }
+  h2 {
+    margin: 0 0 16px 0;
+    font-size: 20px;
+  }
+  select, input[type="text"], button {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+  }
+  button {
+    border: none;
+    background: #4CAF50;
+    color: #fff;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #45a049;
+  }
+  #description {
+    font-size: 14px;
+    color: #555;
+    margin-top: 12px;
+  }
+  #result {
+    margin-top: 20px;
+    padding: 12px;
+    background: #f4f4f4;
+    border-radius: 6px;
+    font-weight: bold;
+  }
+  #statusDesc {
+    margin-top: 10px;
+    font-size: 14px;
+    color: #333;
+    text-align: left;
+    white-space: pre-line;
+  }
+  .logo {
+    display: block;
+    margin: 0 auto 20px;
+    width: 300px;
+    height: 300px;
+    object-fit: contain;
+  }
+  .logo-bottom {
+    display: block;
+    margin: 20px auto 0;
+    width: 300px;
+    height: 300px;
+    object-fit: contain;
+  }
 </style>
 </head>
 <body>
 <div class="container">
-    <!-- 查詢表單上方圖片 -->
-<img src="https://kksunflowerusa.github.io/logo/KK%20logo.png"
-     alt="物流圖片"
-     style="display:block; margin:20px auto 0; width:200px; height:200px; object-fit:contain;">
+
+  <!-- 表單上方圖片 -->
+  <img src="https://kksunflowerusa.github.io/logo/KK%20logo.png"
+       alt="物流圖片"
+       class="logo">
+
   <h2>KK Sunflower 國際物流<br>訂單狀態查詢</h2>
 
   <!-- 資料來源選擇 -->
@@ -47,14 +111,15 @@
   <div id="result"></div>
   <div id="statusDesc"></div>
 
-  <!-- 查詢表單下方圖片 -->
-<img src="https://kksunflowerusa.github.io/carrier/Carrier.png"
-     alt="物流圖片"
-     style="display:block; margin:20px auto 0; width:400px; height:400px; object-fit:contain;">
+  <!-- 表單下方圖片 -->
+  <img src="https://kksunflowerusa.github.io/carrier/Carrier.png"
+       alt="物流圖片"
+       class="logo-bottom">
+
 </div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwtOLTAfDgSmjjddoVJGxmmk0_pBJL38OkiEfv4rFZDKL2d8VuNyAuK87s-5Tia7xLS/exec'; // ←改成你的 Apps Script URL
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwtOLTAfDgSmjjddoVJGxmmk0_pBJL38OkiEfv4rFZDKL2d8VuNyAuK87s-5Tia7xLS/exec';
 
 // 狀態說明對照表
 const statusMap = {
@@ -94,7 +159,7 @@ function checkOrder() {
   statusDescEl.textContent = '';
 
   fetch(`${SCRIPT_URL}?source=${encodeURIComponent(source)}&order=${encodeURIComponent(order)}`)
-    .then(r => r.text()) // ★ 使用 text()，因為 Apps Script 回傳純文字
+    .then(r => r.text())
     .then(txt => {
       const st = txt.trim() || "訂單尚未更新";
       resultEl.textContent = `狀態：${st}`;
@@ -112,9 +177,3 @@ inputEl.addEventListener('keyup', e => { if(e.key === 'Enter') checkOrder(); });
 </script>
 </body>
 </html>
-
-
-
-
-
-
