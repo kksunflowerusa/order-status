@@ -27,7 +27,7 @@
   </div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby-xSzSCELJpjTyQ44W0XLOZLvNe2l32A0sddi3FCOU2qAIZzHjqLiTfVIgH8ZRuTga/exec'; // <- 替換成你的 Apps Script URL
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby-xSzSCELJpjTyQ44W0XLOZLvNe2l32A0sddi3FCOU2qAIZzHjqLiTfVIgH8ZRuTga/exec'; // ←換成你的 Apps Script URL
 
 // 狀態對照表
 const statusMap = {
@@ -43,7 +43,8 @@ const statusMap = {
   "台灣國內轉運寄出": "表示訂單已從台灣轉運站寄出前往客戶台灣收件地址",
   "訂單已完成": "表示訂單已全部完成",
   "訂單已取消": "表示訂單已取消",
-  "訂單已更改": "表示訂單已更改表單"
+  "訂單已更改": "表示訂單已更改表單",
+  "": "訂單尚未更新" // 若狀態是空白
 };
 
 const inputEl = document.getElementById('order');
@@ -54,42 +55,38 @@ const statusDescEl = document.getElementById('statusDesc');
 
 function checkOrder() {
   const order = inputEl.value.trim();
-  if(!order){ 
-    resultEl.textContent=''; 
-    statusDescEl.textContent='';
-    descEl.textContent='請輸入訂單號並按「查詢」'; 
-    return; 
+  if (!order) {
+    resultEl.textContent = '';
+    statusDescEl.textContent = '';
+    descEl.textContent = '請輸入訂單號並按「查詢」';
+    return;
   }
 
-  descEl.textContent='';
-  resultEl.textContent='查詢中…';
-  statusDescEl.textContent='';
+  descEl.textContent = '';
+  resultEl.textContent = '查詢中…';
+  statusDescEl.textContent = '';
 
   fetch(`${SCRIPT_URL}?order=${encodeURIComponent(order)}`)
-    .then(r=>r.text())
-    .then(txt=>{
-      if(!txt || txt === "查無此訂單"){
-        resultEl.textContent = '查無此訂單';
-        statusDescEl.textContent = '';
+    .then(r => r.json()) // ★ 解析 JSON
+    .then(data => {
+      const status = data.result || "";  // 取 result 欄位
+      if (!status) {
+        resultEl.textContent = '訂單尚未更新';
+        statusDescEl.textContent = statusMap[""];
       } else {
-        resultEl.textContent = `狀態：${txt}`;
-        // 顯示說明文字
-        let desc = statusMap[txt] || "無對應說明";
-        statusDescEl.textContent = desc;
+        resultEl.textContent = `狀態：${status}`;
+        statusDescEl.textContent = statusMap[status] || "無對應說明";
       }
     })
-    .catch(err=>{
+    .catch(err => {
       console.error(err);
-      resultEl.textContent='查詢失敗，請稍後再試';
-      statusDescEl.textContent='';
+      resultEl.textContent = '查詢失敗，請稍後再試';
+      statusDescEl.textContent = '';
     });
 }
 
 btnEl.addEventListener('click', checkOrder);
-inputEl.addEventListener('keyup', e=>{ if(e.key==='Enter') checkOrder(); });
+inputEl.addEventListener('keyup', e => { if (e.key === 'Enter') checkOrder(); });
 </script>
 </body>
 </html>
-
-
-
