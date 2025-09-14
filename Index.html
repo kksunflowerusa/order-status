@@ -27,9 +27,10 @@
   </div>
 
 <script>
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby-xSzSCELJpjTyQ44W0XLOZLvNe2l32A0sddi3FCOU2qAIZzHjqLiTfVIgH8ZRuTga/exec'; // ←換成你的 Apps Script URL
+/* ★★ 將這個 URL 換成你部署的 Apps Script 網址 */
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzNswjAgDWN3DEi-wCGMh_ZZ_JO8J6WBpH0SXcXI6PTH_fMCDDSmnDK-4CFm3fONBwq/exec';
 
-// 狀態對照表
+/* 狀態對照表 */
 const statusMap = {
   "新訂單": "新成立訂單",
   "新竹物流取件已安排": "表示已經委派台灣物流去取件",
@@ -44,7 +45,7 @@ const statusMap = {
   "訂單已完成": "表示訂單已全部完成",
   "訂單已取消": "表示訂單已取消",
   "訂單已更改": "表示訂單已更改表單",
-  "": "訂單尚未更新" // 若狀態是空白
+  "訂單尚未更新": "目前尚無更新資訊"
 };
 
 const inputEl = document.getElementById('order');
@@ -66,17 +67,19 @@ function checkOrder() {
   resultEl.textContent = '查詢中…';
   statusDescEl.textContent = '';
 
+  /* ★★ 呼叫 Apps Script API 並解析 JSON */
   fetch(`${SCRIPT_URL}?order=${encodeURIComponent(order)}`)
-    .then(r => r.json()) // ★ 解析 JSON
+    .then(r => r.json())
     .then(data => {
-      const status = data.result || "";  // 取 result 欄位
-      if (!status) {
-        resultEl.textContent = '訂單尚未更新';
-        statusDescEl.textContent = statusMap[""];
-      } else {
-        resultEl.textContent = `狀態：${status}`;
-        statusDescEl.textContent = statusMap[status] || "無對應說明";
+      // Apps Script 回傳格式 {status:"ok", order:"xxx", result:"訂單已完成"}
+      if (data.status !== "ok") {
+        resultEl.textContent = '查詢失敗，請稍後再試';
+        return;
       }
+
+      const status = data.result || "訂單尚未更新";
+      resultEl.textContent = `狀態：${status}`;
+      statusDescEl.textContent = statusMap[status] || "無對應說明";
     })
     .catch(err => {
       console.error(err);
