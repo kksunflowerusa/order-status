@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>訂單狀態查詢</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+  .container { background: #fff; padding: 40px 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; width: 90%; max-width: 400px; }
+  h2 { margin: 0 0 16px 0; font-size: 20px; }
+  input[type="text"] { width: 100%; padding: 12px; margin-bottom: 12px; font-size: 16px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
+  button { width: 100%; padding: 12px; font-size: 16px; border: none; border-radius: 6px; background: #4CAF50; color: #fff; cursor: pointer; }
+  button:hover { background: #45a049; }
+  #description { font-size: 14px; color: #555; margin-top: 12px; }
+  #result { margin-top: 20px; padding: 12px; background: #f4f4f4; border-radius: 6px; font-weight: bold; }
+  #statusDesc { margin-top: 10px; font-size: 14px; color: #333; text-align: left; white-space: pre-line; }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h2>KK Sunflower 國際物流<br>訂單狀態查詢</h2>
+    <input id="order" type="text" placeholder="請輸入訂單號" />
+    <button id="btn">查詢</button>
+    <div id="description">請輸入訂單號並按「查詢」</div>
+    <div id="result"></div>
+    <div id="statusDesc"></div>
+  </div>
+
+<script>
+const SCRIPT_URL = 'https://script.google.com/macros/s/你的ScriptID/exec'; // <- 替換成你的 Apps Script URL
+
+// 狀態對照表
+const statusMap = {
+  "新訂單": "新成立訂單",
+  "新竹物流取件已安排": "表示已經委派台灣物流去取件",
+  "包裹抵達轉運站": "表示訂單已全部抵達轉運站",
+  "包裹自行寄往轉運站": "表示訂單由客戶端自行透過超商或者宅配/郵局等方式自行寄到TW轉運站",
+  "包裹等待整併中": "表示訂單仍在等待重新打包，或有多件包裹尚未全部抵達轉運站",
+  "台灣寄往美國中": "表示訂單已從台灣寄出，尚未抵達美國",
+  "美國寄往台灣中": "表示訂單已從美國寄出，尚未抵達台灣",
+  "包裹抵達美國": "表示訂單已抵達美國轉運站，等待寄出",
+  "美國國內轉運寄出": "表示訂單已從美國轉運站寄出前往客戶美國收件地址",
+  "台灣國內轉運寄出": "表示訂單已從台灣轉運站寄出前往客戶台灣收件地址",
+  "訂單已完成": "表示訂單已全部完成",
+  "訂單已取消": "表示訂單已取消",
+  "訂單已更改": "表示訂單已更改表單"
+};
+
+const inputEl = document.getElementById('order');
+const btnEl = document.getElementById('btn');
+const resultEl = document.getElementById('result');
+const descEl = document.getElementById('description');
+const statusDescEl = document.getElementById('statusDesc');
+
+function checkOrder() {
+  const order = inputEl.value.trim();
+  if(!order){ 
+    resultEl.textContent=''; 
+    statusDescEl.textContent='';
+    descEl.textContent='請輸入訂單號並按「查詢」'; 
+    return; 
+  }
+
+  descEl.textContent='';
+  resultEl.textContent='查詢中…';
+  statusDescEl.textContent='';
+
+  fetch(`${SCRIPT_URL}?order=${encodeURIComponent(order)}`)
+    .then(r=>r.text())
+    .then(txt=>{
+      if(!txt || txt === "查無此訂單"){
+        resultEl.textContent = '查無此訂單';
+        statusDescEl.textContent = '';
+      } else {
+        resultEl.textContent = `狀態：${txt}`;
+        // 顯示說明文字
+        let desc = statusMap[txt] || "無對應說明";
+        statusDescEl.textContent = desc;
+      }
+    })
+    .catch(err=>{
+      console.error(err);
+      resultEl.textContent='查詢失敗，請稍後再試';
+      statusDescEl.textContent='';
+    });
+}
+
+btnEl.addEventListener('click', checkOrder);
+inputEl.addEventListener('keyup', e=>{ if(e.key==='Enter') checkOrder(); });
+</script>
+</body>
+</html>
