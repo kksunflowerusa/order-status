@@ -124,6 +124,7 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwtOLTAfDgSmjjddoVJG
 // 狀態說明對照表
 const statusMap = {
   "新訂單": "新成立訂單",
+  "宅配通物流取件已安排": "表示已經委派台灣物流去取件",
   "新竹物流取件已安排": "表示已經委派台灣物流去取件",
   "包裹抵達轉運站": "表示訂單已全部抵達轉運站",
   "包裹自行寄往轉運站": "表示訂單由客戶端自行寄到TW轉運站",
@@ -177,5 +178,6 @@ inputEl.addEventListener('keyup', e => { if(e.key === 'Enter') checkOrder(); });
 </script>
 </body>
 </html>
+
 
 
